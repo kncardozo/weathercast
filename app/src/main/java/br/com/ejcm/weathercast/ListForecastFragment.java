@@ -1,5 +1,7 @@
 package br.com.ejcm.weathercast;
 
+import android.app.LauncherActivity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
@@ -8,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,8 +29,9 @@ import java.net.URL;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ListForecastFragment extends Fragment {
+public class ListForecastFragment extends Fragment{
     private static final String LOG_TAG = " ";
+    public static final String DETAIL = "qualquer coisa";
     private ArrayAdapter <String> mForecastAdapter;
     public ListForecastFragment() {
     }
@@ -49,9 +54,18 @@ public class ListForecastFragment extends Fragment {
                 R.id.list_item_text_view);
 
         View rootView = inflater.inflate(R.layout.fragment_list_forecast, container, false);
-        ListView list = (ListView) rootView.findViewById(R.id.list_forcast);
+        ListView list = (ListView) rootView.findViewById(R.id.list_forecast);
         list.setAdapter(mForecastAdapter);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView lv, View v, int position, long id) {
+
+                Intent it = new Intent(getContext(),ItemDescription.class);
+                it.putExtra(DETAIL, ((TextView) v).getText());
+                startActivity(it);
+
+            }
+        });
 
         return rootView;
     }
@@ -62,6 +76,7 @@ public class ListForecastFragment extends Fragment {
         fwt.execute();
 
     }
+
     private class FetchWeatherTask extends AsyncTask<Void, Void, String[]> {
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays) {
             String[] result = new String[numDays];

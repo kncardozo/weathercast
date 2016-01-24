@@ -6,6 +6,4 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:id="@+id/list_item_text_view"
     android:padding="@dimen/fab_margin">
-
-
 </TextView>
