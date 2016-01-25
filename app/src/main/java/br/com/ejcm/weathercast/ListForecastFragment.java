@@ -25,12 +25,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ListForecastFragment extends Fragment{
-    private static final String LOG_TAG = " ";
+    private static final String LOG_TAG = ListForecastFragment.class.getName();
     public static final String DETAIL = "qualquer coisa";
     private ArrayAdapter <String> mForecastAdapter;
     public ListForecastFragment() {
@@ -78,13 +80,24 @@ public class ListForecastFragment extends Fragment{
     }
 
     private class FetchWeatherTask extends AsyncTask<Void, Void, String[]> {
+        private String formatDate(long dateInMillis) {
+            DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
+            return df.format(new Date(dateInMillis));
+        }
+
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays) {
             String[] result = new String[numDays];
+            final String OWM_DATE = "dt";
             try {
                 JSONObject forecast = new JSONObject(forecastJsonStr);
                 JSONArray list = forecast.getJSONArray("list");
                 for (int i = 0; i < numDays; i++){
+
                     JSONObject day = list.getJSONObject(i);
+
+                    long dateInMillis = day.getLong(OWM_DATE)*1000;
+                    String date = formatDate(dateInMillis);
+
                     JSONObject temp = day.getJSONObject("temp");
                     String min = temp.getString("min");
                     String max = temp.getString("max");
@@ -92,12 +105,14 @@ public class ListForecastFragment extends Fragment{
                             .getJSONObject(0)
                             .getString("main");
                     StringBuilder sb = new StringBuilder();
-                    sb.append(desc)
+                    sb
+                            .append(date)
+                            .append("\n")
+                            .append(desc)
                             .append(" - ")
-                            .append("temp min: " + min)
+                            .append("Min: " + min + " ºC")
                             .append(" /")
-                            .append(" temp max: " + max);
-
+                            .append("Max: " + max + " ºC");
                     result[i]= sb.toString();
                 }
             } catch (JSONException e) {
